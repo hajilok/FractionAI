@@ -1,0 +1,20 @@
+{
+  "name": "fractionai",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@google-cloud/vision": "^4.3.2",
+    "axios": "^1.7.9",
+    "chalk": "^5.4.1",
+    "figlet": "^1.8.0",
+    "web3": "^4.16.0"
+  }
+}
