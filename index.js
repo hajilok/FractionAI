@@ -26,6 +26,7 @@ const login = async (privateKey) => {
 
     const getNonce = await axios.get('https://dapp-backend-large.fractionai.xyz/api3/auth/nonce');
     const nonce = getNonce.data.nonce;
+    console.log(chalk.green(`Nonce: ${nonce}`));
     // Perbarui payload dengan data dinamis
     const issuedAt = new Date().toISOString(); // Timestamp saat ini
     const message = `dapp.fractionai.xyz wants you to sign in with your Ethereum account:
@@ -116,9 +117,9 @@ const main = async () => {
                 } catch (error) {
                     console.error(error);
                 }
-                console.log(chalk.blue('Menunggu 20 menit sebelum siklus berikutnya...'));
-                await delay(1200000); // Delay 10 menit
             }
+            console.log(chalk.blue('Menunggu 20 menit sebelum siklus berikutnya...'));
+                await delay(1200000); // Delay 10 menit
         }
 };
 
