@@ -4,6 +4,8 @@ import figlet from "figlet";
 import Web3 from "web3";
 import fs from "fs/promises";
 import JoinSpace from "./joinSpace.js";
+import { join } from "path";
+import { error } from "console";
 
 const displayBanner = () => {
     console.log(chalk.cyan(figlet.textSync('Makmum Airdrop', {
@@ -85,7 +87,7 @@ const main = async () => {
                             try {
                                 const joinSpace = await axios.post(
                                     `https://dapp-backend-large.fractionai.xyz/api3/matchmaking/initiate`,
-                                    { userId: getlogin.user.Id, agentId: aiagentId, entryFees: 0.0001, sessionTypeId: 1 },
+                                    { userId: getlogin.user.Id, agentId: aiagentId, entryFees: 0.001, sessionTypeId: 1 },
                                     {
                                         headers: {
                                             Authorization: `Bearer ${getlogin.accessToken}`,
@@ -103,17 +105,23 @@ const main = async () => {
                                         console.log(chalk.yellow(`Failed join space with ${agentName} agent: ${aiagentId}, Reason: ${error.response.data.error}`));
                                     } else {
                                         console.log(chalk.yellow(`Failed join space with ${agentName} agent: ${aiagentId}, Status: ${error.response.status}, Reason: ${error.response.data.error || "Unknown"}`));
+                                        console.log(chalk.blue('Menunggu 3 menit sebelum agent berikutnya...'));
+                                        await delay(300000) 
                                     }
                                 } else if (error.request) {
                                     console.log(chalk.red(`No response received. Request failed: ${error.message}`));
+                                    console.log(chalk.blue('Menunggu 3 menit sebelum agent berikutnya...'));
+                                    await delay(300000) // Delay 10 menit
                                 } else {
                                     console.log(chalk.red(`Error occurred: ${error.message}`));
+                                    console.log(chalk.blue('Menunggu 3 menit sebelum agent berikutnya...'));
+                                    await delay(300000) // Delay 10 menit
                                 }
-                            }
+                            }     
                             
                         }
-                        break
                     }
+                    
                 } catch (error) {
                     console.error(error);
                 }
