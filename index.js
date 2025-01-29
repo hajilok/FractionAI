@@ -4,6 +4,7 @@ import figlet from "figlet";
 import Web3 from "web3";
 import fs from "fs/promises";
 import JoinSpace from "./joinSpace.js";
+import getSessions from "./getSessions.js";
 
 const displayBanner = () => {
     console.log(chalk.cyan(figlet.textSync('Makmum Airdrop', {
@@ -73,47 +74,48 @@ const main = async () => {
                 const getAiagent = await JoinSpace(getlogin.accessToken, getlogin.user.id);
                 console.log(chalk.green(`Success login with wallet: ${getlogin.user.walletAddress} \nFractal Amount : ${getlogin.user.fractal}`));
                 console.log(chalk.green(`Total agent: ${getAiagent.aiagentId.length}`));
-                
-                let agentCount = 0;
                 for (let j = 0; j < getAiagent.aiagentId.length; j++) {
-                    if (agentCount >= 2) {
-                        console.log(chalk.yellow('Menunggu 3 menit sebelum melanjutkan ke agen berikutnya...'));
-                        await delay(180000);
-                        agentCount = 0;
-                    }
-                    
                     const aiagentId = getAiagent.aiagentId[j];
                     const agentName = getAiagent.nameAgent[j];
-                    try {
-                        const joinSpace = await axios.post(
-                            `https://dapp-backend-large.fractionai.xyz/api3/matchmaking/initiate`,
-                            { userId: getlogin.user.id, agentId: aiagentId, entryFees: 0.001, sessionTypeId: 1 },
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${getlogin.accessToken}`,
-                                    'Content-Type': 'application/json'
+                    const session = await getSessions(getlogin);
+                    if (session.length < 2) {
+                        try {
+                            const joinSpace = await axios.post(
+                                `https://dapp-backend-large.fractionai.xyz/api3/matchmaking/initiate`,
+                                { userId: getlogin.user.id, agentId: aiagentId, entryFees: 0.001, sessionTypeId: 1 },
+                                {
+                                    headers: {
+                                        Authorization: `Bearer ${getlogin.accessToken}`,
+                                        'Content-Type': 'application/json'
+                                    }
                                 }
+                            );
+                        
+                            if (joinSpace.status === 200) {
+                                console.log(chalk.green(`Success join space with ${agentName} : agentId: ${aiagentId} `));
                             }
-                        );
-                    
-                        if (joinSpace.status === 200) {
-                            console.log(chalk.green(`Success join space with ${agentName} : agentId: ${aiagentId} `));
-                            agentCount++;
+                        } catch (error) {
+                            if (error.response) {
+                                console.log(chalk.yellow(`Failed join space with ${agentName} agent: ${aiagentId}, Status: ${error.response.status}, Reason: ${error.response.data.error || "Unknown"}`));
+                            } else {
+                                console.log(chalk.red(`Error occurred: ${error.message}`));
+                            }
                         }
-                    } catch (error) {
-                        if (error.response) {
-                            console.log(chalk.yellow(`Failed join space with ${agentName} agent: ${aiagentId}, Status: ${error.response.status}, Reason: ${error.response.data.error || "Unknown"}`));
-                        } else {
-                            console.log(chalk.red(`Error occurred: ${error.message}`));
-                        }
+                    } else if ( session.length >= 2 ) { 
+                        console.log(chalk.yellow(`Session penuh `));
+                        console.log(chalk.yellow('Menunggu 3 menit sebelum melanjutkan ke agent berikutnya...'));
+                        await delay(180000);
+                    } else {
+                        console.log(chalk.yellow(` Error Session tidak ditemukan `));
                     }
+                    
                 }
             } catch (error) {
                 console.error(error);
             }
         }
-        console.log(chalk.blue('Menunggu 20 menit sebelum siklus berikutnya...'));
-        await delay(1200000);
+        console.log(chalk.blue('Menunggu 10 menit sebelum siklus berikutnya...'));
+        await delay(600000);
     }
 };
 
