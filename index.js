@@ -105,17 +105,14 @@ const main = async () => {
                                         console.log(chalk.yellow(`Failed join space with ${agentName} agent: ${aiagentId}, Reason: ${error.response.data.error}`));
                                     } else {
                                         console.log(chalk.yellow(`Failed join space with ${agentName} agent: ${aiagentId}, Status: ${error.response.status}, Reason: ${error.response.data.error || "Unknown"}`));
-                                        console.log(chalk.blue('Menunggu 3 menit sebelum agent berikutnya...'));
-                                        await delay(300000) 
+                                        break
                                     }
                                 } else if (error.request) {
                                     console.log(chalk.red(`No response received. Request failed: ${error.message}`));
-                                    console.log(chalk.blue('Menunggu 3 menit sebelum agent berikutnya...'));
-                                    await delay(300000) // Delay 10 menit
+                                    break
                                 } else {
                                     console.log(chalk.red(`Error occurred: ${error.message}`));
-                                    console.log(chalk.blue('Menunggu 3 menit sebelum agent berikutnya...'));
-                                    await delay(300000) // Delay 10 menit
+                                    break
                                 }
                             }     
                             
