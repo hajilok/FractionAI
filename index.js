@@ -78,7 +78,7 @@ const main = async () => {
                     const aiagentId = getAiagent.aiagentId[j];
                     const agentName = getAiagent.nameAgent[j];
                     const session = await getSessions(getlogin);
-                    if (session.length < 2) {
+                    if (session.length < 6) {
                         try {
                             const joinSpace = await axios.post(
                                 `https://dapp-backend-large.fractionai.xyz/api3/matchmaking/initiate`,
@@ -101,7 +101,7 @@ const main = async () => {
                                 console.log(chalk.red(`Error occurred: ${error.message}`));
                             }
                         }
-                    } else if ( session.length >= 2 ) { 
+                    } else if ( session.length >= 6 ) { 
                         console.log(chalk.yellow(`Session penuh `));
                         console.log(chalk.yellow('Menunggu 1 jam sebelum melanjutkan ke agent berikutnya...'));
                         await delay(3600000);
