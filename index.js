@@ -103,8 +103,8 @@ const main = async () => {
                         }
                     } else if ( session.length >= 2 ) { 
                         console.log(chalk.yellow(`Session penuh `));
-                        console.log(chalk.yellow('Menunggu 3 menit sebelum melanjutkan ke agent berikutnya...'));
-                        await delay(180000);
+                        console.log(chalk.yellow('Menunggu 1 jam sebelum melanjutkan ke agent berikutnya...'));
+                        await delay(3600000);
                     } else {
                         console.log(chalk.yellow(` Error Session tidak ditemukan `));
                     }
