@@ -95,7 +95,11 @@ const main = async () => {
                                 console.log(chalk.green(`Success join space with ${agentName} : agentId: ${aiagentId} `));
                             }
                         } catch (error) {
-                            if (error.response) {
+                            if (error.response.data.error.includes('6 for the hour')) {
+                                console.log(chalk.yellow(`Session penuh `));
+                                console.log(chalk.yellow('Menunggu 1 jam sebelum melanjutkan ke agent berikutnya...'));
+                                await delay(3600000);
+                            } else if (error.response) {
                                 console.log(chalk.yellow(`Failed join space with ${agentName} agent: ${aiagentId}, Status: ${error.response.status}, Reason: ${error.response.data.error || "Unknown"}`));
                             } else {
                                 console.log(chalk.red(`Error occurred: ${error.message}`));
@@ -104,7 +108,7 @@ const main = async () => {
                     } else if ( session.length >= 6 ) { 
                         console.log(chalk.yellow(`Session penuh `));
                         console.log(chalk.yellow('Menunggu 1 jam sebelum melanjutkan ke agent berikutnya...'));
-                        await delay(3600000);
+                        await delay(180000);
                     } else {
                         console.log(chalk.yellow(` Error Session tidak ditemukan `));
                     }
