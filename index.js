@@ -119,7 +119,7 @@ const main = async () => {
             }
         }
         console.log(chalk.blue('Menunggu 10 menit sebelum siklus berikutnya...'));
-        await delay(600000);
+        await delay(180000);
     }
 };
 
