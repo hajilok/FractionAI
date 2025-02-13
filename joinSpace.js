@@ -1,22 +1,31 @@
-import axios from "axios";
-
 const JoinSpace = async (bearer, id) => {
-    const getAiagent = await axios.get(`https://dapp-backend-large.fractionai.xyz/api3/agents/user/${id}`, {headers: {Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json'}});
-    const aiagent = getAiagent.data;
-    const aiagentId = []
-    const nameAgent = []
-    for (let i = 0 ; i < aiagent.length; i++) {
-        aiagentId.push(aiagent[i].id);
-        nameAgent.push(aiagent[i].name);
+  console.log(bearer);
+  try {
+    const response = await fetch(
+      `https://dapp-backend-4x.fractionai.xyz/api3/agents/user/${id}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${bearer}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const detail = {
-        aiagentId: aiagentId,
-        nameAgent: nameAgent
-    }
+    const aiagent = await response.json();
+    const aiagentId = aiagent.map((agent) => agent.id);
+    const nameAgent = aiagent.map((agent) => agent.name);
 
-    return detail;
-
+    return { aiagentId, nameAgent };
+  } catch (error) {
+    console.error("Error:", error.message);
+    return null;
+  }
 };
 
 export default JoinSpace;
