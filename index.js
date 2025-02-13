@@ -5,6 +5,9 @@ import Web3 from "web3";
 import fs from "fs/promises";
 import JoinSpace from "./joinSpace.js";
 import getSessions from "./getSessions.js";
+import { getRandom } from "random-useragent";
+
+const random = getRandom();
 
 const displayBanner = () => {
   console.log(
@@ -112,7 +115,10 @@ const main = async () => {
                 {
                   headers: {
                     Authorization: `Bearer ${getlogin.accessToken}`,
+                    "User-Agent": random,
+                    "Accept-Language": "en-US,en;q=0.9",
                     "Content-Type": "application/json",
+                    "Allowed-State": "na",
                   },
                 }
               );

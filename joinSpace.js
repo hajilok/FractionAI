@@ -1,5 +1,10 @@
+import { getRandom } from "random-useragent";
+
+const random = getRandom();
+
 const JoinSpace = async (bearer, id) => {
-  console.log(bearer);
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  await delay(3000);
   try {
     const response = await fetch(
       `https://dapp-backend-4x.fractionai.xyz/api3/agents/user/${id}`,
@@ -7,13 +12,16 @@ const JoinSpace = async (bearer, id) => {
         method: "GET",
         headers: {
           Authorization: `Bearer ${bearer}`,
+          "User-Agent": random,
+          "Accept-Language": "en-US,en;q=0.9",
           "Content-Type": "application/json",
-          Accept: "application/json",
+          "Allowed-State": "na",
         },
       }
     );
 
     if (!response.ok) {
+      console.log(response);
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
