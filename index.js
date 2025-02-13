@@ -134,9 +134,9 @@ const main = async () => {
               if (error.response) {
                 console.log(error.response.data.error);
 
-                // console.log(chalk.yellow(`Session penuh `));
-                // console.log(chalk.yellow('Menunggu 1 jam sebelum melanjutkan ke agent berikutnya...'));
-                // await delay(3600000);
+                console.log(chalk.yellow(`Session penuh `));
+                console.log(chalk.yellow('Menunggu 1 jam sebelum melanjutkan ke agent berikutnya...'));
+                await delay(3600000);
               } else if (error.response) {
                 console.log(
                   chalk.yellow(
