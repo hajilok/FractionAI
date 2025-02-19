@@ -3,8 +3,6 @@ import { getRandom } from "random-useragent";
 const random = getRandom();
 
 const JoinSpace = async (bearer, id) => {
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  await delay(3000);
   try {
     const response = await fetch(
       `https://dapp-backend-4x.fractionai.xyz/api3/agents/user/${id}`,

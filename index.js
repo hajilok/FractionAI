@@ -6,6 +6,8 @@ import fs from "fs/promises";
 import JoinSpace from "./joinSpace.js";
 import getSessions from "./getSessions.js";
 import { getRandom } from "random-useragent";
+import solvedCapcha from "./bypass.js";
+import joinRapSpace from "./rapSpace.js";
 
 const random = getRandom();
 
@@ -27,18 +29,24 @@ const displayBanner = () => {
 };
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const getNonce = async () => {
+  const getNonce = await axios.get(
+    "https://dapp-backend-4x.fractionai.xyz/api3/auth/nonce"
+  );
+  const nonce = getNonce.data.nonce;
+  return {
+    nonce,
+    url: getNonce.data.image,
+  };
+};
+
 const login = async (privateKey) => {
   const web3 = new Web3(
     new Web3.providers.HttpProvider("https://sepolia.infura.io")
   );
   const account = web3.eth.accounts.privateKeyToAccount(privateKey);
   web3.eth.accounts.wallet.add(account);
-
-  const getNonce = await axios.get(
-    "https://dapp-backend-4x.fractionai.xyz/api3/auth/nonce"
-  );
-  const nonce = getNonce.data.nonce;
-  console.log(chalk.green(`Nonce: ${nonce}`));
+  const { nonce } = await getNonce();
 
   const issuedAt = new Date().toISOString();
   const message = `dapp.fractionai.xyz wants you to sign in with your Ethereum account:
@@ -79,6 +87,10 @@ const main = async () => {
     .replace(/\r/g, "")
     .split("\n")
     .filter(Boolean);
+  const api = (await fs.readFile("api.txt", "utf-8"))
+    .replace(/\r/g, "")
+    .split("\n")
+    .filter(Boolean);
 
   while (true) {
     for (let i = 0; i < wallet.length; i++) {
@@ -102,79 +114,41 @@ const main = async () => {
           const aiagentId = getAiagent.aiagentId[j];
           const agentName = getAiagent.nameAgent[j];
           const session = await getSessions(getlogin);
-          if (session.length < 6) {
-            try {
-              const joinSpace = await axios.post(
-                `https://dapp-backend-4x.fractionai.xyz/api3/matchmaking/initiate`,
-                {
-                  userId: getlogin.user.id,
-                  agentId: aiagentId,
-                  entryFees: 0.001,
-                  sessionTypeId: 1,
-                },
-                {
-                  headers: {
-                    Authorization: `Bearer ${getlogin.accessToken}`,
-                    "User-Agent": random,
-                    "Accept-Language": "en-US,en;q=0.9",
-                    "Content-Type": "application/json",
-                    "Allowed-State": "na",
-                  },
-                }
-              );
 
-              if (joinSpace.status === 200) {
-                console.log(
-                  chalk.green(
-                    `Success join space with ${agentName} : agentId: ${aiagentId} `
-                  )
-                );
-              }
-            } catch (error) {
-              if (error.response) {
-                if (
-                  error.response.data.error.includes(
-                    " maximum number of sessions"
-                  )
-                ) {
-                  console.log(chalk.yellow(`Session penuh `));
-                  console.log(
-                    chalk.yellow(
-                      "Menunggu 1 jam sebelum melanjutkan ke agent berikutnya..."
-                    )
-                  );
-                  await delay(3600000);
-                }
-              } else if (error.response) {
-                console.log(
-                  chalk.yellow(
-                    `Failed join space with ${agentName} agent: ${aiagentId}, Status: ${
-                      error.response.status
-                    }, Reason: ${error.response.data.error || "Unknown"}`
-                  )
-                );
-              } else {
-                console.log(chalk.red(`Error occurred: ${error.message}`));
-              }
-            }
-          } else if (session.length >= 6) {
-            console.log(chalk.yellow(`Session penuh `));
-            console.log(
-              chalk.yellow(
-                "Menunggu 1 jam sebelum melanjutkan ke agent berikutnya..."
-              )
+          if (!session || session.length < 6) {
+            const dataIMGNONCE = await getNonce();
+            const getBypass = await solvedCapcha(dataIMGNONCE.url, api[0]);
+            const getJoinSpace = await joinRapSpace(
+              dataIMGNONCE,
+              getBypass,
+              getlogin,
+              aiagentId,
+              agentName
             );
-            await delay(3600000);
+            if (getJoinSpace.status === 200) {
+              console.log(
+                chalk.green(
+                  `Success join space with ${agentName} : agentId: ${aiagentId} `
+                )
+              );
+            } else if (getJoinSpace.error === "Invalid captcha") {
+              console.log(chalk.red("Invalid captcha"));
+            } else if (
+              getJoinSpace.error.includes("maximum number of sessions")
+            ) {
+              console.log(chalk.yellow(`Session full switch for next account`));
+              throw new Error("Session full");
+            }
           } else {
-            console.log(chalk.yellow(` Error Session tidak ditemukan `));
+            console.log(chalk.yellow(`Session full atau tidak ditemukan`));
           }
         }
       } catch (error) {
         console.error(error);
       }
     }
-    console.log(chalk.blue("Menunggu 10 menit sebelum siklus berikutnya..."));
-    await delay(180000);
+    console.log(chalk.blue("Wait 1 Hour to delay fix Session ..."));
+    await delay(3600000);
   }
 };
 
