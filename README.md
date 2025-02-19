@@ -6,6 +6,7 @@
 Disclaimer : 
 - Need Create agent and deposit on ai agent 0.1 ETH sepolia 
 - Intinya sebelum pakai ini harus buat dulu ai agent 
+- Need Apikey from https://2captcha.com/ To bypaass Captcha,
 
 Steps To install : 
 ```
@@ -17,6 +18,13 @@ cd FractionAI
 ```
 npm install
 ```
+Input apiKey From 2chaptcha on api.txt
+
+```
+nano api.txt
+```
+
+
 input Private key wallet on wallet.txt
 
 ```
