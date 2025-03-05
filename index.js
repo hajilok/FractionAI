@@ -122,7 +122,7 @@ const main = async () => {
           if (!session || session.length < 6) {
             const dataIMGNONCE = await getNonce();
             const getBypass = await solvedCapcha(dataIMGNONCE.url, api[0]);
-            if (!getBypass.text) {
+            if ((getBypass.text = null)) {
               console.log(chalk.red("Gagal bypass captcha"));
             } else {
               const getJoinSpace = await joinRapSpace(

@@ -149,11 +149,16 @@ export const solvedCapcha = async (url, api) => {
           );
 
           if (getCapcha.data.status === "ready") {
-            console.log("✅ Captcha solved:", getCapcha.data.solution.text);
-            return {
-              taskId: taskId,
-              text: getCapcha.data.solution.text,
-            };
+            if (!getCapcha.data.solution.text) {
+              console.error("❌ Failed To Get Chaptcha.");
+              return null;
+            } else {
+              console.log("✅ Captcha solved:", getCapcha.data.solution.text);
+              return {
+                taskId: taskId,
+                text: getCapcha.data.solution.text,
+              };
+            }
           }
         } catch (error) {
           console.error(
