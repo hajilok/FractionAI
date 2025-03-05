@@ -88,7 +88,6 @@ export const solvedCapcha = async (url, api) => {
         });
 
         setTimeout(() => {
-          console.log("⏳ Timeout: Wait Time ");
           ws.close();
           reject(new Error("WebSocket Timeout"));
         }, 60000);

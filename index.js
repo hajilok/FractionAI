@@ -122,36 +122,40 @@ const main = async () => {
           if (!session || session.length < 6) {
             const dataIMGNONCE = await getNonce();
             const getBypass = await solvedCapcha(dataIMGNONCE.url, api[0]);
-            const getJoinSpace = await joinRapSpace(
-              dataIMGNONCE,
-              getBypass.text,
-              getlogin,
-              aiagentId,
-              agentName
-            );
-            if (getJoinSpace.status === 200) {
-              const report = await reportCaptcha(api[0], getBypass.taskId);
-              if (report) {
-                console.log(
-                  chalk.green(
-                    `Success join space with ${agentName} : agentId: ${aiagentId} `
-                  )
-                );
-              }
-            } else if (getJoinSpace.error === "Invalid captcha") {
-              const incorrect = await reportIncorrectCaptcha(
-                api[0],
-                getBypass.taskId
+            if (!getBypass.text) {
+              console.log(chalk.red("Gagal bypass captcha"));
+            } else {
+              const getJoinSpace = await joinRapSpace(
+                dataIMGNONCE,
+                getBypass.text,
+                getlogin,
+                aiagentId,
+                agentName
               );
-              if (incorrect) {
-                console.log(chalk.red("Invalid captcha"));
+              if (getJoinSpace.status === 200) {
+                const report = await reportCaptcha(api[0], getBypass.taskId);
+                if (report) {
+                  console.log(
+                    chalk.green(
+                      `Success join space with ${agentName} : agentId: ${aiagentId} `
+                    )
+                  );
+                }
+              } else if (getJoinSpace.error === "Invalid captcha") {
+                const incorrect = await reportIncorrectCaptcha(
+                  api[0],
+                  getBypass.taskId
+                );
+                if (incorrect) {
+                  console.log(chalk.red("Invalid captcha"));
+                }
+              } else if (
+                getJoinSpace.error.includes("maximum number of sessions")
+              ) {
+                throw new Error(
+                  chalk.yellow(`Session full switch for next account`)
+                ).message;
               }
-            } else if (
-              getJoinSpace.error.includes("maximum number of sessions")
-            ) {
-              throw new Error(
-                chalk.yellow(`Session full switch for next account`)
-              ).message;
             }
           } else {
             console.log(chalk.yellow(`Session full atau tidak ditemukan`));
