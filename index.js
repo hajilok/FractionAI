@@ -6,7 +6,11 @@ import fs from "fs/promises";
 import JoinSpace from "./joinSpace.js";
 import getSessions from "./getSessions.js";
 import { getRandom } from "random-useragent";
-import solvedCapcha from "./bypass.js";
+import {
+  solvedCapcha,
+  reportCaptcha,
+  reportIncorrectCaptcha,
+} from "./bypass.js";
 import joinRapSpace from "./rapSpace.js";
 
 const random = getRandom();
@@ -120,24 +124,34 @@ const main = async () => {
             const getBypass = await solvedCapcha(dataIMGNONCE.url, api[0]);
             const getJoinSpace = await joinRapSpace(
               dataIMGNONCE,
-              getBypass,
+              getBypass.text,
               getlogin,
               aiagentId,
               agentName
             );
             if (getJoinSpace.status === 200) {
-              console.log(
-                chalk.green(
-                  `Success join space with ${agentName} : agentId: ${aiagentId} `
-                )
-              );
+              const report = await reportCaptcha(api[0], getBypass.taskId);
+              if (report) {
+                console.log(
+                  chalk.green(
+                    `Success join space with ${agentName} : agentId: ${aiagentId} `
+                  )
+                );
+              }
             } else if (getJoinSpace.error === "Invalid captcha") {
-              console.log(chalk.red("Invalid captcha"));
+              const incorrect = await reportIncorrectCaptcha(
+                api[0],
+                getBypass.taskId
+              );
+              if (incorrect) {
+                console.log(chalk.red("Invalid captcha"));
+              }
             } else if (
               getJoinSpace.error.includes("maximum number of sessions")
             ) {
-              console.log(chalk.yellow(`Session full switch for next account`));
-              throw new Error("Session full");
+              throw new Error(
+                chalk.yellow(`Session full switch for next account`)
+              ).message;
             }
           } else {
             console.log(chalk.yellow(`Session full atau tidak ditemukan`));
