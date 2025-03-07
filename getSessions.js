@@ -17,6 +17,7 @@ const getSessions = async (getlogin) => {
           "Accept-Language": "en-US,en;q=0.9",
           "Content-Type": "application/json",
           "Allowed-State": "na",
+          Authorization: `Bearer ${getlogin.accessToken}`,
         },
       }
     );
