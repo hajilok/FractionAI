@@ -4,9 +4,11 @@
 - Feadback Jika ada error di https://t.me/makmum/
 
 Disclaimer : 
-- Need Create agent and deposit on ai agent 0.1 ETH sepolia 
+- Need Create agent on rapspace and deposit on ai agent 0.1 ETH sepolia 
 - Intinya sebelum pakai ini harus buat dulu ai agent 
-- Need Apikey from https://2captcha.com/ To bypaass Captcha,
+- Need Apikey from https://2captcha.com/ or https://nopecha.com/ To bypaass Captcha,
+
+Soon i will add another bypass capcha and another agent battle like dobbyarena
 
 Steps To install : 
 ```
@@ -18,10 +20,12 @@ cd FractionAI
 ```
 npm install
 ```
-Input apiKey From 2chaptcha on api.txt
+Input apiKey From 2chaptcha or nopecha on config.js
+
+or if you want to use both, you can just put them all in
 
 ```
-nano api.txt
+nano config.js
 ```
 
 
