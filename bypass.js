@@ -39,76 +39,76 @@ export const solvedCapcha = async (url, api) => {
       return null;
     }
 
-    function generateSessionHash() {
-      return crypto.randomBytes(8).toString("hex");
-    }
+    // function generateSessionHash() {
+    //   return crypto.randomBytes(8).toString("hex");
+    // }
 
-    const sessionHash = generateSessionHash();
-    const dataBase64 = Buffer.from(getImage.data).toString("base64");
+    // const sessionHash = generateSessionHash();
+    // const dataBase64 = Buffer.from(getImage.data).toString("base64");
 
-    const wsFunction = async (dataBase64, sessionHash) => {
-      return new Promise((resolve, reject) => {
-        const ws = new WebSocket("wss://pixnova.ai/upscale-img/queue/join");
+    // const wsFunction = async (dataBase64, sessionHash) => {
+    //   return new Promise((resolve, reject) => {
+    //     const ws = new WebSocket("wss://pixnova.ai/upscale-img/queue/join");
 
-        ws.on("open", () => {
-          console.log("✅ Connected to Pixnova WebSocket");
-          ws.send(
-            JSON.stringify({ msg: "session_hash", session_hash: sessionHash })
-          );
-          ws.send(
-            JSON.stringify({
-              msg: "send_data",
-              data: { source_image: `data:image/png;base64,${dataBase64}` },
-            })
-          );
-        });
+    //     ws.on("open", () => {
+    //       console.log("✅ Connected to Pixnova WebSocket");
+    //       ws.send(
+    //         JSON.stringify({ msg: "session_hash", session_hash: sessionHash })
+    //       );
+    //       ws.send(
+    //         JSON.stringify({
+    //           msg: "send_data",
+    //           data: { source_image: `data:image/png;base64,${dataBase64}` },
+    //         })
+    //       );
+    //     });
 
-        ws.on("message", (data) => {
-          try {
-            const jsonData = JSON.parse(data);
+    //     ws.on("message", (data) => {
+    //       try {
+    //         const jsonData = JSON.parse(data);
 
-            if (jsonData.msg === "process_completed") {
-              console.log("✅ Processing done:", jsonData.output.result[0]);
-              ws.close();
-              resolve(jsonData.output.result[0]);
-            }
-          } catch (error) {
-            console.error("❌ Error parsing WebSocket message:", error.message);
-          }
-        });
+    //         if (jsonData.msg === "process_completed") {
+    //           console.log("✅ Processing done:", jsonData.output.result[0]);
+    //           ws.close();
+    //           resolve(jsonData.output.result[0]);
+    //         }
+    //       } catch (error) {
+    //         console.error("❌ Error parsing WebSocket message:", error.message);
+    //       }
+    //     });
 
-        ws.on("error", (error) => {
-          console.error("❌ WebSocket Error:", error);
-          ws.close();
-          reject(error);
-        });
+    //     ws.on("error", (error) => {
+    //       console.error("❌ WebSocket Error:", error);
+    //       ws.close();
+    //       reject(error);
+    //     });
 
-        ws.on("close", () => {
-          console.log("🔌 WebSocket connection closed");
-        });
+    //     ws.on("close", () => {
+    //       console.log("🔌 WebSocket connection closed");
+    //     });
 
-        setTimeout(() => {
-          ws.close();
-          reject(new Error("WebSocket Timeout"));
-        }, 60000);
-      });
-    };
+    //     setTimeout(() => {
+    //       ws.close();
+    //       reject(new Error("WebSocket Timeout"));
+    //     }, 60000);
+    //   });
+    // };
 
-    const urlImage = await wsFunction(dataBase64, sessionHash);
-    if (!urlImage) {
-      console.error("❌ Gagal mendapatkan URL hasil captcha.");
-      return null;
-    }
+    // const urlImage = await wsFunction(dataBase64, sessionHash);
+    // if (!urlImage) {
+    //   console.error("❌ Gagal mendapatkan URL hasil captcha.");
+    //   return null;
+    // }
 
-    const getDataImage = await fetchWithRetry(urlImage, {
-      responseType: "arraybuffer",
-      timeout: 60000,
-    });
+    // const getDataImage = await fetchWithRetry(urlImage, {
+    //   responseType: "arraybuffer",
+    //   timeout: 60000,
+    // });
 
-    if (!getDataImage) {
-      console.error("❌ Gagal mendapatkan gambar hasil captcha.");
-      return null;
-    }
+    // if (!getDataImage) {
+    //   console.error("❌ Gagal mendapatkan gambar hasil captcha.");
+    //   return null;
+    // }
 
     const capchaSolved = await axios.post(
       "https://api.2captcha.com/createTask",
@@ -116,7 +116,7 @@ export const solvedCapcha = async (url, api) => {
         clientKey: api,
         task: {
           type: "ImageToTextTask",
-          body: Buffer.from(getDataImage.data).toString("base64"),
+          body: Buffer.from(getImage.data).toString("base64"),
           phrase: false,
           case: true,
           numeric: 0,

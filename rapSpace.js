@@ -1,16 +1,9 @@
 import axios from "axios";
-import chalk from "chalk";
 import { getRandom } from "random-useragent";
 
 const random = getRandom();
 
-const joinRapSpace = async (
-  dataIMGNONCE,
-  getBypass,
-  getlogin,
-  aiagentId,
-  agentName
-) => {
+const joinRapSpace = async (getBypass, getlogin, aiagentId, nonce) => {
   try {
     const joinSpace = await axios.post(
       `https://dapp-backend-4x.fractionai.xyz/api3/matchmaking/initiate`,
@@ -19,7 +12,7 @@ const joinRapSpace = async (
         agentId: aiagentId,
         entryFees: 0.001,
         sessionTypeId: 1,
-        nonce: dataIMGNONCE.nonce,
+        nonce: nonce,
         captchaText: getBypass,
       },
       {

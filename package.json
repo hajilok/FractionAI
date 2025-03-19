@@ -11,12 +11,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@google-cloud/vision": "^4.3.2",
     "axios": "^1.7.9",
     "chalk": "^5.4.1",
     "crypto": "^1.0.1",
     "figlet": "^1.8.0",
     "form-data": "^4.0.2",
+    "nopecha": "^1.0.11",
     "random-useragent": "^0.5.0",
     "sharp": "^0.33.5",
     "web3": "^4.16.0",

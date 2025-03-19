@@ -6,12 +6,10 @@ import fs from "fs/promises";
 import JoinSpace from "./joinSpace.js";
 import getSessions from "./getSessions.js";
 import { getRandom } from "random-useragent";
-import {
-  solvedCapcha,
-  reportCaptcha,
-  reportIncorrectCaptcha,
-} from "./bypass.js";
+import { solvedCapcha } from "./bypass.js";
+import { Nocaptcha } from "./bypassNochapcha.js";
 import joinRapSpace from "./rapSpace.js";
+import { token } from "./config.js";
 
 const random = getRandom();
 
@@ -91,10 +89,10 @@ const main = async () => {
     .replace(/\r/g, "")
     .split("\n")
     .filter(Boolean);
-  const api = (await fs.readFile("api.txt", "utf-8"))
-    .replace(/\r/g, "")
-    .split("\n")
-    .filter(Boolean);
+  // const api = (await fs.readFile("api.txt", "utf-8"))
+  //   .replace(/\r/g, "")
+  //   .split("\n")
+  //   .filter(Boolean);
 
   while (true) {
     for (let i = 0; i < wallet.length; i++) {
@@ -114,6 +112,31 @@ const main = async () => {
           )
         );
         console.log(chalk.green(`Total agent: ${getAiagent.aiagentId.length}`));
+        const getTiypebypass = async (dataIMGNONCE) => {
+          let api;
+          if (token["2chapcha"] && token.Nocapcha) {
+            const random = Math.floor(Math.random() * 2);
+            if (random === 0) {
+              api = token["2chapcha"];
+              console.log(`use 2chapcha`);
+              return (await solvedCapcha(dataIMGNONCE.url, api)).text;
+            } else {
+              api = token.Nocapcha;
+              console.log(`use nochapcha`);
+              return await Nocaptcha(api, dataIMGNONCE.url);
+            }
+          } else if (token["2chapcha"]) {
+            api = token["2chapcha"];
+            console.log(`use 2chapcha`);
+            return (await solvedCapcha(dataIMGNONCE.url, api)).text;
+          } else if (token.Nocapcha) {
+            api = token.Nocapcha;
+            console.log(`use nochapcha`);
+            return await Nocaptcha(api, dataIMGNONCE.url);
+          } else {
+            throw new Error("No captcha service available");
+          }
+        };
         for (let j = 0; j < getAiagent.aiagentId.length; j++) {
           const aiagentId = getAiagent.aiagentId[j];
           const agentName = getAiagent.nameAgent[j];
@@ -121,41 +144,29 @@ const main = async () => {
 
           if (!session || session.length < 6) {
             const dataIMGNONCE = await getNonce();
-            const getBypass = await solvedCapcha(dataIMGNONCE.url, api[0]);
-            if ((getBypass.text = null)) {
-              console.log(chalk.red("Gagal bypass captcha"));
-            } else {
-              const getJoinSpace = await joinRapSpace(
-                dataIMGNONCE,
-                getBypass.text,
-                getlogin,
-                aiagentId,
-                agentName
+            const getTypechapcha = await getTiypebypass(dataIMGNONCE);
+            const getJoinSpace = await joinRapSpace(
+              getTypechapcha,
+              getlogin,
+              aiagentId,
+              dataIMGNONCE.nonce
+            );
+            if (getJoinSpace.status === 200) {
+              console.log(
+                chalk.green(
+                  `Success join space with ${agentName} : agentId: ${aiagentId} `
+                )
               );
-              if (getJoinSpace.status === 200) {
-                const report = await reportCaptcha(api[0], getBypass.taskId);
-                if (report) {
-                  console.log(
-                    chalk.green(
-                      `Success join space with ${agentName} : agentId: ${aiagentId} `
-                    )
-                  );
-                }
-              } else if (getJoinSpace.error === "Invalid captcha") {
-                const incorrect = await reportIncorrectCaptcha(
-                  api[0],
-                  getBypass.taskId
-                );
-                if (incorrect) {
-                  console.log(chalk.red("Invalid captcha"));
-                }
-              } else if (
-                getJoinSpace.error.includes("maximum number of sessions")
-              ) {
-                throw new Error(
-                  chalk.yellow(`Session full switch for next account`)
-                ).message;
-              }
+            } else if (getJoinSpace.error === "Invalid captcha") {
+              console.log(chalk.red("Invalid captcha"));
+            } else if (
+              getJoinSpace.error.includes("maximum number of sessions")
+            ) {
+              throw new Error(
+                chalk.yellow(`Session full switch for next account`)
+              ).message;
+            } else {
+              console.log(chalk.yellow(getJoinSpace.error));
             }
           } else {
             console.log(chalk.yellow(`Session full atau tidak ditemukan`));
